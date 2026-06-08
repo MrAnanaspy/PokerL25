@@ -30,3 +30,13 @@ class GameResponse(BaseModel):
     id: int
     start_game: datetime
     max_players: int
+
+
+class RegForTheGame(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: int
+    game_id: int
+    user_id: int
+    reg_datetime: datetime
+
