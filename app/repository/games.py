@@ -59,3 +59,10 @@ def checking_game_registration(game_id: int, db: Session, current_user: int) -> 
         RegistrationForTheGame.game_id == game_id,
         RegistrationForTheGame.user_id == current_user
     ).first() is not None
+
+
+def cancel_reg_for_the_game(game_id: int, db: Session, current_user: int) -> RegistrationForTheGame:
+    reg = db.query(RegistrationForTheGame).filter(RegistrationForTheGame.game_id == game_id).scalar()
+    db.delete(reg)
+    db.flush()
+    return reg

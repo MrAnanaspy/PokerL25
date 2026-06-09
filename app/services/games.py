@@ -81,3 +81,26 @@ def reg_for_the_game(game_id: int, db: Session, current_user: User) -> RegForThe
 
     db.commit()
     return RegForTheGame.model_validate(reg)
+
+
+def cancel_reg_for_the_game(game_id: int, db: Session, current_user: User) -> str:
+
+    if not games_repository.is_game_exist(db, game_id):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Game {game_id} not found"
+        )
+
+    if not games_repository.checking_game_registration(game_id=game_id, db=db, current_user=current_user.id):
+        raise HTTPException(
+            status_code=400,
+            detail=f"The user {current_user.login} is not registered in the game {game_id}"
+        )
+
+    reg = games_repository.cancel_reg_for_the_game(
+        game_id=game_id,
+        db=db,
+        current_user=current_user.id
+    )
+    db.commit()
+    return f"The user {current_user.login} canceled in the game {game_id}"

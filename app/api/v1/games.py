@@ -62,3 +62,16 @@ def reg_for_the_game(
         db=db,
         current_user=current_user,
     )
+
+
+@router.post("/game/cancel_reg")
+def cancel_reg_for_the_game(
+        game_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+):
+    return games_service.cancel_reg_for_the_game(
+        game_id=game_id,
+        db=db,
+        current_user=current_user,
+    )
