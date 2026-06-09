@@ -82,7 +82,11 @@ class TimerResponse(BaseModel):
     started_at: datetime | None
     paused_at: datetime | None
 
-    quantity_chips: int
-    total_time: int
-    level_duration: int
 
+class PlayOrPauseTimerResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: int
+    game_id: int
+    started_at: datetime | None
+    paused_at: datetime | None

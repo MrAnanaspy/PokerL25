@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from app.repository import games as games_repository
 from app.dependency import get_current_user
 from app.models import User, Game
-from app.schemas import GameRequest, GameResponse, RegForTheGame, TimerCreateResponse, TimerResponse
+from app.schemas import GameRequest, GameResponse, RegForTheGame, TimerCreateResponse, TimerResponse, \
+    PlayOrPauseTimerResponse
 
 
 def create_game(game: GameRequest, db: Session, current_user: User) -> GameResponse:
@@ -147,3 +148,43 @@ def get_timer(game_id: int, db: Session, current_user: User) -> dict:
         result[int(i)] = bb
 
     return result
+
+
+def play_or_pause_timer(game_id: int, play: bool, db: Session, current_user: User) -> PlayOrPauseTimerResponse:
+
+    if not games_repository.is_game_exist(db, game_id):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Game {game_id} not found"
+        )
+
+    timer = games_repository.get_timer(game_id=game_id, db=db)
+
+    if play:
+        if timer.started_at is None:
+            timer.started_at = datetime.now()
+        elif timer.paused_at is not None:
+            timer.started_at = timer.started_at + (datetime.now() - timer.paused_at)
+            timer.paused_at = None
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Timer already started"
+            )
+
+    else:
+        if timer.paused_at:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Timer already paused"
+            )
+        timer.paused_at = datetime.now()
+    db.commit()
+    response = PlayOrPauseTimerResponse(
+        id=timer.id,
+        game_id=game_id,
+        started_at=timer.started_at,
+        paused_at=timer.paused_at
+    )
+
+    return response

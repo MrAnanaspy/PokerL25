@@ -84,7 +84,7 @@ def cancel_reg_for_the_game(
     )
 
 
-@router.post("/game/timer")
+@router.get("/game/timer")
 def get_timer(
         game_id: int,
         db: Session = Depends(get_db),
@@ -92,6 +92,21 @@ def get_timer(
 ):
     return games_service.get_timer(
         game_id=game_id,
+        db=db,
+        current_user=current_user,
+    )
+
+
+@router.post("/game/timer")
+def play_or_pause_timer(
+        game_id: int,
+        play: bool,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+):
+    return games_service.play_or_pause_timer(
+        game_id=game_id,
+        play=play,
         db=db,
         current_user=current_user,
     )
