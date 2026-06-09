@@ -16,11 +16,18 @@ def create_game(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user),
 ):
-    return games_service.create_game(
+    game = games_service.create_game(
         game=game_request,
         db=db,
         current_user=current_user,
     )
+    timer = games_service.create_timer(
+        game_id=game.id,
+        db=db,
+        current_user=current_user
+    )
+
+    return game, timer
 
 
 @router.get("/game")
@@ -71,6 +78,19 @@ def cancel_reg_for_the_game(
         current_user: User = Depends(get_current_user),
 ):
     return games_service.cancel_reg_for_the_game(
+        game_id=game_id,
+        db=db,
+        current_user=current_user,
+    )
+
+
+@router.post("/game/timer")
+def get_timer(
+        game_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user),
+):
+    return games_service.get_timer(
         game_id=game_id,
         db=db,
         current_user=current_user,

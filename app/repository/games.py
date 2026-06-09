@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.models import Game, User, RegistrationForTheGame
+from app.models import Game, User, RegistrationForTheGame, Timer
 from app.schemas import GameResponse
 
 
@@ -15,6 +15,16 @@ def create_game(game_datetime: datetime, quantity_user: int, db: Session) -> Gam
     db.flush()
 
     return game
+
+
+def create_timer(game_id: int, db: Session) -> Game:
+    timer = Timer(
+        game_id=game_id,
+    )
+    db.add(timer)
+    db.flush()
+
+    return timer
 
 
 def get_game(game_id: int, db: Session) -> Game:
@@ -66,3 +76,8 @@ def cancel_reg_for_the_game(game_id: int, db: Session, current_user: int) -> Reg
     db.delete(reg)
     db.flush()
     return reg
+
+
+def get_timer(game_id: int, db: Session) -> Timer:
+    timer = db.query(Timer).filter(Timer.game_id == game_id).scalar()
+    return timer
